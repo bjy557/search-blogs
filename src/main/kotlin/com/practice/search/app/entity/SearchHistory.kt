@@ -1,4 +1,4 @@
-package com.practice.search.app.dto
+package com.practice.search.app.entity
 
 import jakarta.persistence.*
 
@@ -10,7 +10,7 @@ data class SearchHistory(
     val id: Long? = null,
             
     @Column(name = "keyword", nullable = false)
-    val keyWord: String = "",
+    val keyword: String = "",
     
     @Column(name = "count", nullable = false)
     val count: Int = 0
