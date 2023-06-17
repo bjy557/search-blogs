@@ -1,13 +1,10 @@
 package com.practice.search.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.practice.search.app.entity.Document
-import com.practice.search.app.entity.Meta
-import com.practice.search.app.entity.SearchResult
 import com.practice.search.app.exception.NoSearchResultException
 import com.practice.search.app.exception.SearchServiceException
 import com.practice.search.app.service.SearchService
-import com.practice.search.web.response.SearchBlogResponse
+import com.practice.search.data.TestDataGenerator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -40,7 +37,7 @@ class SearchControllerTest {
     // open api 테스트의 경우 dummy data를 임의로 받거나 직접 예외를 던져서 테스트하도록 구현함.
     @Test
     fun `Test searchBlogs endpoint`() {
-        val expectedResponse = generateSearchBlogResponse()
+        val expectedResponse = TestDataGenerator.generateSearchBlogResponse()
 
         val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
         `when`(searchService.searchBlogs("test", pageable)).thenReturn(expectedResponse)
@@ -125,29 +122,5 @@ class SearchControllerTest {
 
         val serverErrMessage = result.resolvedException?.message
         assertEquals("Internal server error", serverErrMessage)
-    }
-
-    private fun generateSearchBlogResponse(): SearchBlogResponse {
-        val searchResult = SearchResult(
-            Meta(totalCount = 100, pageableCount = 10, isEnd = false),
-            listOf(
-                Document(
-                    title = "test blog",
-                    contents = "this is test blog",
-                    url = "https://example.com/test-blog",
-                    blogname = "test blog",
-                    thumbnail = "https://example.com/test-blog/thumbnail.jpg",
-                    datetime = "2023-06-17T10:00:00"
-                )
-            )
-        )
-
-        return SearchBlogResponse(
-            content = searchResult.documents,
-            pageable = PageRequest.of(1, 10, Sort.by("accuracy")),
-            totalElements = 1,
-            totalPages = 1,
-            last = false
-        )
     }
 }
