@@ -1,6 +1,6 @@
 package com.practice.search.app.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.gson.Gson
 import com.practice.search.app.entity.SearchHistory
 import com.practice.search.app.entity.SearchResult
 import com.practice.search.app.repository.SearchHistoryRepository
@@ -14,12 +14,12 @@ import kotlin.math.ceil
 @Service
 class SearchService(
     private val webClientService: WebClientService,
-    private val objectMapper: ObjectMapper,
-    private val searchHistoryRepository: SearchHistoryRepository
+    private val searchHistoryRepository: SearchHistoryRepository,
+    private val gson: Gson
 ) {
     fun searchBlogs(query: String, pageable: Pageable): SearchBlogResponse {
         val response = webClientService.fetchData(query, pageable).block()
-        val searchResult = objectMapper.readValue(response, SearchResult::class.java)
+        val searchResult = gson.fromJson(response, SearchResult::class.java)
         val totalElements = searchResult.meta.pageableCount
         val totalPages = ceil(totalElements / pageable.pageSize.toDouble()).toInt()
 
