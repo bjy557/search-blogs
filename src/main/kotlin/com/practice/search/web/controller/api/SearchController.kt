@@ -1,4 +1,4 @@
-package com.practice.search.web.controller
+package com.practice.search.web.controller.api
 
 import com.practice.search.app.entity.SearchResult
 import com.practice.search.app.service.SearchService
