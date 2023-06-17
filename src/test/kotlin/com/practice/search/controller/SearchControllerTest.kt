@@ -8,7 +8,7 @@ import com.practice.search.app.exception.NoSearchResultException
 import com.practice.search.app.exception.SearchServiceException
 import com.practice.search.app.service.SearchService
 import com.practice.search.web.response.SearchBlogResponse
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
@@ -74,7 +74,7 @@ class SearchControllerTest {
                 .andReturn()
 
         val errMessage = result.resolvedException?.message
-        Assertions.assertEquals("No content search result", errMessage)
+        assertEquals("No content search result", errMessage)
     }
 
     @Test
@@ -89,7 +89,7 @@ class SearchControllerTest {
                 .andReturn()
 
         val pageErrMessage = result1.resolvedException?.message
-        Assertions.assertEquals("Page limit is 50", pageErrMessage)
+        assertEquals("Page limit is 50", pageErrMessage)
 
         val result2 =
             mockMvc.perform(
@@ -102,7 +102,7 @@ class SearchControllerTest {
                 .andReturn()
         
         val sizeErrMessage = result2.resolvedException?.message
-        Assertions.assertEquals("Size limit is 50", sizeErrMessage)
+        assertEquals("Size limit is 50", sizeErrMessage)
     }
 
     @Test
@@ -124,7 +124,7 @@ class SearchControllerTest {
                 .andReturn()
 
         val serverErrMessage = result.resolvedException?.message
-        Assertions.assertEquals("Internal server error", serverErrMessage)
+        assertEquals("Internal server error", serverErrMessage)
     }
 
     private fun generateSearchBlogResponse(): SearchBlogResponse {
