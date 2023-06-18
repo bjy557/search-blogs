@@ -3,10 +3,13 @@ package com.practice.search.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.practice.search.app.dto.SearchHistoryDto
 import com.practice.search.app.exception.ResponseException
 import com.practice.search.app.exception.ResponseExceptionCode
+import com.practice.search.app.service.SearchHistoryService
 import com.practice.search.app.service.SearchService
 import com.practice.search.data.TestDataGenerator
+import com.practice.search.web.response.SearchHistoryResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -35,6 +38,9 @@ class SearchControllerTest {
 
     @MockBean
     private lateinit var searchService: SearchService
+    
+    @MockBean
+    private lateinit var searchHistoryService: SearchHistoryService
 
     // open api 테스트의 경우 dummy data를 임의로 받거나 직접 예외를 던져서 테스트하도록 구현함.
     @Test
@@ -155,5 +161,16 @@ class SearchControllerTest {
             "Internal server error", 
             Gson().fromJson(result, JsonObject::class.java).get("message").asString
         )
+    }
+    
+    @Test
+    fun `Test getHistories`() {
+        val searchHistoryDtos = TestDataGenerator.generateSearchHistories().map(SearchHistoryDto::of)
+
+        `when`(searchHistoryService.findTop10Histories()).thenReturn(searchHistoryDtos)
+
+        mockMvc.perform(get("/search/history"))
+            .andExpect(status().isOk)
+            .andExpect(content().string(Gson().toJson(SearchHistoryResponse(searchHistoryDtos))))
     }
 }

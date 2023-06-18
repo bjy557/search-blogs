@@ -2,6 +2,7 @@ package com.practice.search.data
 
 import com.practice.search.app.entity.Document
 import com.practice.search.app.entity.Meta
+import com.practice.search.app.entity.SearchHistory
 import com.practice.search.app.entity.SearchResult
 import com.practice.search.web.response.SearchBlogResponse
 import org.springframework.data.domain.PageRequest
@@ -40,6 +41,21 @@ object TestDataGenerator {
             totalElements = 10,
             totalPages = 1,
             last = false
+        )
+    }
+    
+    fun generateSearchHistories(): List<SearchHistory> {
+        return listOf(
+            SearchHistory("k1", 10),
+            SearchHistory("k2", 9),
+            SearchHistory("k3", 8),
+            SearchHistory("k4", 7),
+            SearchHistory("k5", 6),
+            SearchHistory("k6", 5),
+            SearchHistory("k7", 4),
+            SearchHistory("k8", 3),
+            SearchHistory("k9", 2),
+            SearchHistory("k10", 1),
         )
     }
 }
