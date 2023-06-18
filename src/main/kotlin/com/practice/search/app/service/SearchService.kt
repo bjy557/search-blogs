@@ -3,6 +3,8 @@ package com.practice.search.app.service
 import com.google.gson.Gson
 import com.practice.search.app.entity.SearchHistory
 import com.practice.search.app.entity.SearchResult
+import com.practice.search.app.exception.ResponseException
+import com.practice.search.app.exception.ResponseExceptionCode
 import com.practice.search.app.repository.SearchHistoryRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Pageable
@@ -17,8 +19,17 @@ class SearchService(
     private val entityService: EntityService
 ) {
     fun searchBlogs(query: String, pageable: Pageable): SearchResult {
+        print(pageable)
+        if (pageable.pageNumber > 50 || pageable.pageSize > 50) {
+            throw ResponseException(ResponseExceptionCode.INVALID_PAGEABLE)
+        }
+
         val response = webClientService.fetchData(query, pageable).block()
         val searchResult = gson.fromJson(response, SearchResult::class.java)
+        
+        if (searchResult.documents.isEmpty()) {
+            throw ResponseException(ResponseExceptionCode.NO_SEARCH_RESULT)
+        }
 
         increaseSearchCount(query)
 
