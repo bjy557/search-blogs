@@ -1,7 +1,5 @@
-package com.practice.search.app.service
+package com.practice.search.app.service.provider
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.practice.search.app.entity.SearchResult
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -10,15 +8,15 @@ import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 
 @Service
-class WebClientService(
-    @Value("\${dapi.key}")
+class KakaoApiProviderService(
+    @Value("\${api.kakao.authKey}")
     private val authKey: String,
     private val webClient: WebClient,
-) {
-    fun fetchData(query: String, pageable: Pageable): Mono<String> {
+) : ApiProviderService {
+    override fun fetchData(query: String, pageable: Pageable): Mono<String> {
         val baseUrl = "https://dapi.kakao.com/v2/search/blog"
-        
-        // sort property만 추출, direction 값을 같이 넘기면 정렬 안되는 이슈 
+
+        // sort property만 추출, direction 값을 같이 넘기면(ex. accuracy:ASC) 정렬 안되는 이슈 
         val sort = pageable.sort.map { it.property }.toList()[0]
 
         val uri = UriComponentsBuilder.fromUriString(baseUrl)
