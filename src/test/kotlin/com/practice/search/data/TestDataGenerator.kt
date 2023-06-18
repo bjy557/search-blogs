@@ -37,7 +37,7 @@ object TestDataGenerator {
         return SearchBlogResponse(
             content = searchResult.documents,
             pageable = PageRequest.of(1, 10, Sort.by("accuracy")),
-            totalElements = 1,
+            totalElements = 10,
             totalPages = 1,
             last = false
         )

@@ -37,10 +37,11 @@ class SearchControllerTest {
     // open api 테스트의 경우 dummy data를 임의로 받거나 직접 예외를 던져서 테스트하도록 구현함.
     @Test
     fun `Test searchBlogs endpoint`() {
+        val expectedSearchResult = TestDataGenerator.generateSearchResult()
         val expectedResponse = TestDataGenerator.generateSearchBlogResponse()
 
         val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
-        `when`(searchService.searchBlogs("test", pageable)).thenReturn(expectedResponse)
+        `when`(searchService.searchBlogs("test", pageable)).thenReturn(expectedSearchResult)
 
         mockMvc.perform(
             get("/search/blog")

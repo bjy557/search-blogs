@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import kotlin.math.ceil
 
 @RestController
 @RequestMapping("/search")
@@ -21,6 +22,18 @@ class SearchController(
         @RequestParam(value = "query", required = true) query: String,
         @PageableDefault(size = 10, page = 1, sort = ["accuracy", "recency"]) pageable: Pageable
     ): ResponseEntity<SearchBlogResponse> {
-        return ResponseEntity.ok(searchService.searchBlogs(query, pageable))
+        val searchResult = searchService.searchBlogs(query, pageable)
+        val totalElements = searchResult.meta.pageableCount
+        val totalPages = ceil(totalElements / pageable.pageSize.toDouble()).toInt()
+        
+        return ResponseEntity.ok(
+            SearchBlogResponse(
+                searchResult.documents,
+                pageable,
+                totalElements,
+                totalPages,
+                searchResult.meta.isEnd
+            )
+        )
     }
 }
