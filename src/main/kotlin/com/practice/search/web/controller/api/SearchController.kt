@@ -1,8 +1,9 @@
 package com.practice.search.web.controller.api
 
-import com.practice.search.app.entity.SearchResult
+import com.practice.search.app.service.SearchHistoryService
 import com.practice.search.app.service.SearchService
 import com.practice.search.web.response.SearchBlogResponse
+import com.practice.search.web.response.SearchHistoryResponse
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.ResponseEntity
@@ -15,7 +16,8 @@ import kotlin.math.ceil
 @RestController
 @RequestMapping("/search")
 class SearchController(
-    private val searchService: SearchService
+    private val searchService: SearchService,
+    private val searchHistoryService: SearchHistoryService
 ) {
     @GetMapping("/blog")
     fun getBlogs(
@@ -35,5 +37,11 @@ class SearchController(
                 searchResult.meta.isEnd
             )
         )
+    }
+    
+    @GetMapping("/history")
+    fun getHistories(): ResponseEntity<SearchHistoryResponse> {
+        val popularKeywords = searchHistoryService.findTop10Histories()
+        return ResponseEntity.ok(SearchHistoryResponse(popularKeywords))
     }
 }
