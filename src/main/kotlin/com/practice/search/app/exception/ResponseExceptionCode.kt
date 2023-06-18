@@ -8,7 +8,8 @@ enum class ResponseExceptionCode(status: HttpStatus, message: String) {
     NO_SEARCH_RESULT(HttpStatus.NO_CONTENT, "There is no content"),
     
     // 4xx
-    INVALID_PAGEABLE(HttpStatus.BAD_REQUEST, "Page limit exceeded. Maximum limit is 50."),
+    INVALID_PAGE_NUMBER(HttpStatus.BAD_REQUEST, "Page limit exceeded. Maximum limit is 50."),
+    INVALID_SIZE_NUMBER(HttpStatus.BAD_REQUEST, "Size limit exceeded. Maximum limit is 50."),
     INVALID_QUERY(HttpStatus.BAD_REQUEST, "Input a query containing at least 2 character."),
     
     // 5xx

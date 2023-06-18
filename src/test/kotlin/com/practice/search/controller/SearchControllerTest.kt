@@ -82,10 +82,10 @@ class SearchControllerTest {
     }
 
     @Test
-    fun `Test searchBlogs endpoint with invalid pageable`() {
+    fun `Test searchBlogs endpoint with invalid page number`() {
         val pageable = PageRequest.of(51, 10, Sort.by("accuracy"))
         `when`(searchService.searchBlogs("test", pageable))
-            .thenThrow(ResponseException(ResponseExceptionCode.INVALID_PAGEABLE))
+            .thenThrow(ResponseException(ResponseExceptionCode.INVALID_PAGE_NUMBER))
 
         val result =
             mockMvc.perform(
@@ -102,6 +102,31 @@ class SearchControllerTest {
 
         assertEquals(
             "Page limit exceeded. Maximum limit is 50.",
+            Gson().fromJson(result, JsonObject::class.java).get("message").asString
+        )
+    }
+    
+    @Test
+    fun `Test searchBlogs endpoint with invalid size number`() {
+        val pageable = PageRequest.of(1, 51, Sort.by("accuracy"))
+        `when`(searchService.searchBlogs("test", pageable))
+            .thenThrow(ResponseException(ResponseExceptionCode.INVALID_SIZE_NUMBER))
+
+        val result =
+            mockMvc.perform(
+                get("/search/blog")
+                    .param("query", "test")
+                    .param("sort", "accuracy")
+                    .param("page", "1")
+                    .param("size", "51") // size 50 제한
+            )
+                .andExpect(status().isBadRequest)    // check 400 code
+                .andReturn()
+                .response
+                .contentAsString
+
+        assertEquals(
+            "Size limit exceeded. Maximum limit is 50.",
             Gson().fromJson(result, JsonObject::class.java).get("message").asString
         )
     }
