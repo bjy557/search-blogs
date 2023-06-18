@@ -1,6 +1,8 @@
 package com.practice.search.service
 
 import com.google.gson.Gson
+import com.practice.search.app.entity.SearchHistory
+import com.practice.search.app.exception.NoSearchResultException
 import com.practice.search.app.repository.SearchHistoryRepository
 import com.practice.search.app.service.SearchService
 import com.practice.search.app.service.WebClientService
@@ -8,6 +10,7 @@ import com.practice.search.data.TestDataGenerator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
@@ -56,5 +59,19 @@ class SearchServiceTest {
         assertThrows<NoSearchResultException> { 
             searchService.searchBlogs("test", pageable)
         }
+    }
+    
+    @Test
+    fun `Test increaseSearchCount when search history exists`() {
+        // 검색 수행 시 해당 keyword의 count를 증가시킴
+        val keyword = "test"
+        val existingSearchHistory = SearchHistory(keyword, 5)
+
+        `when`(searchHistoryRepository.findByKeyword(keyword)).thenReturn(existingSearchHistory)
+        `when`(searchHistoryRepository.save(existingSearchHistory)).thenReturn(existingSearchHistory)
+
+        searchService.increaseSearchCount(keyword)
+
+        assertEquals(6, existingSearchHistory.count)
     }
 }
