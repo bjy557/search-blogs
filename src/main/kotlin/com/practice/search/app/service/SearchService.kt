@@ -6,8 +6,10 @@ import com.practice.search.app.entity.SearchResult
 import com.practice.search.app.exception.ResponseException
 import com.practice.search.app.exception.ResponseExceptionCode
 import com.practice.search.app.repository.SearchHistoryRepository
+import jakarta.persistence.LockModeType
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.stereotype.Service
 import java.nio.charset.Charset
 
@@ -16,8 +18,7 @@ import java.nio.charset.Charset
 class SearchService(
     private val webClientService: WebClientService,
     private val searchHistoryRepository: SearchHistoryRepository,
-    private val gson: Gson,
-    private val entityService: EntityService
+    private val gson: Gson
 ) {
     fun searchBlogs(query: String, pageable: Pageable): SearchResult {
         validateParameter(query, pageable)
@@ -34,6 +35,8 @@ class SearchService(
         return searchResult
     }
 
+//    @Lock(value = LockModeType.PESSIMISTIC_WRITE) // fail test 100 requests concurrently
+    @Synchronized // success test 100 requests concurrently
     fun increaseSearchCount(keyword: String) {
         val searchHistory = searchHistoryRepository.findByKeyword(keyword)
         searchHistory?.run {
