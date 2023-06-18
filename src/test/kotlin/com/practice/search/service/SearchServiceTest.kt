@@ -44,4 +44,17 @@ class SearchServiceTest {
 
         assertEquals(expectedResponse, response)
     }
+
+    @Test
+    fun `Test searchBlogs endpoint with no search result`() {
+        val expectedSearchResult = TestDataGenerator.generateEmptySearchResult()
+
+        val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
+        val mockResponse = Gson().toJson(expectedSearchResult)
+        `when`(webClientService.fetchData("test", pageable)).thenReturn(Mono.just(mockResponse))
+
+        assertThrows<NoSearchResultException> { 
+            searchService.searchBlogs("test", pageable)
+        }
+    }
 }

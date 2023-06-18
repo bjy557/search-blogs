@@ -24,6 +24,13 @@ object TestDataGenerator {
         )
     }
     
+    fun generateEmptySearchResult(): SearchResult {
+        return SearchResult(
+            Meta(totalCount = 100, pageableCount = 10, isEnd = false),
+            emptyList()
+        )
+    }
+    
     fun generateSearchBlogResponse(): SearchBlogResponse {
         val searchResult = generateSearchResult()
 
