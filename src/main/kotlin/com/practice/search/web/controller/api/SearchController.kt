@@ -25,7 +25,7 @@ class SearchController(
         @PageableDefault(size = 10, page = 1, sort = ["accuracy", "recency"]) pageable: Pageable
     ): ResponseEntity<SearchBlogResponse> {
         val searchResult = searchService.searchBlogs(query, pageable)
-        val totalElements = searchResult.meta.pageableCount
+        val totalElements = searchResult.pageableCount
         val totalPages = ceil(totalElements / pageable.pageSize.toDouble()).toInt()
         
         return ResponseEntity.ok(
@@ -34,7 +34,7 @@ class SearchController(
                 pageable,
                 totalElements,
                 totalPages,
-                searchResult.meta.isEnd
+                searchResult.last
             )
         )
     }

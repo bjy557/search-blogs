@@ -7,4 +7,15 @@ data class Document(
     val blogname: String = "",
     val thumbnail: String = "",
     val datetime: String = ""
-)
+) {
+    companion object {
+        fun of(item: Item) = Document(
+            title = item.title,
+            contents = item.description,
+            url = item.bloggerlink,
+            blogname = item.bloggername,
+            thumbnail = item.link,
+            datetime = item.postdate
+        )
+    }
+}

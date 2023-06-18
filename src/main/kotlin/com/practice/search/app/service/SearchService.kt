@@ -1,38 +1,61 @@
 package com.practice.search.app.service
 
 import com.google.gson.Gson
+import com.practice.search.app.entity.KakaoApiResponse
+import com.practice.search.app.entity.NaverApiResponse
 import com.practice.search.app.entity.SearchHistory
 import com.practice.search.app.entity.SearchResult
 import com.practice.search.app.exception.ResponseException
 import com.practice.search.app.exception.ResponseExceptionCode
 import com.practice.search.app.repository.SearchHistoryRepository
-import jakarta.persistence.LockModeType
+import com.practice.search.app.service.provider.KakaoApiProviderService
+import com.practice.search.app.service.provider.NaverApiProviderService
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.repository.Lock
 import org.springframework.stereotype.Service
 import java.nio.charset.Charset
 
 @Service
 @Transactional
 class SearchService(
-    private val webClientService: WebClientService,
+    private val kakaoApiProvider: KakaoApiProviderService,
+    private val naverApiProvider: NaverApiProviderService,
     private val searchHistoryRepository: SearchHistoryRepository,
     private val gson: Gson
 ) {
     fun searchBlogs(query: String, pageable: Pageable): SearchResult {
         validateParameter(query, pageable)
 
-        val response = webClientService.fetchData(query, pageable).block()
-        val searchResult = gson.fromJson(response, SearchResult::class.java)
+        val apiProviders = listOf(kakaoApiProvider, naverApiProvider)
 
-        if (searchResult.documents.isEmpty()) {
-            throw ResponseException(ResponseExceptionCode.NO_SEARCH_RESULT)
+        for (apiProvider in apiProviders) {
+            try {
+                val response = apiProvider.fetchData(query, pageable).block()
+
+                when (apiProvider) {
+                    is KakaoApiProviderService -> {
+                        val kakaoResponse = gson.fromJson(response, KakaoApiResponse::class.java)
+                        if (kakaoResponse.documents.isNotEmpty()) {
+                            increaseSearchCount(query)
+                            return SearchResult.of(kakaoResponse)
+                        }
+                    }
+
+                    is NaverApiProviderService -> {
+                        val naverResponse = gson.fromJson(response, NaverApiResponse::class.java)
+                        if (naverResponse.items.isNotEmpty()) {
+                            increaseSearchCount(query)
+                            return SearchResult.of(naverResponse)
+                        }
+                    }
+                    // add other open api
+                }
+            } catch (e: Exception) {
+                continue
+            }
         }
 
-        increaseSearchCount(query)
-
-        return searchResult
+        throw ResponseException(ResponseExceptionCode.NO_SEARCH_RESULT)
     }
 
 //    @Lock(value = LockModeType.PESSIMISTIC_WRITE) // fail test 100 requests concurrently

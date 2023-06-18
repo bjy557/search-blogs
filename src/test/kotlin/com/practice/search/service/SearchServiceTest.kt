@@ -5,7 +5,8 @@ import com.practice.search.app.entity.SearchHistory
 import com.practice.search.app.exception.ResponseException
 import com.practice.search.app.repository.SearchHistoryRepository
 import com.practice.search.app.service.SearchService
-import com.practice.search.app.service.WebClientService
+import com.practice.search.app.service.provider.KakaoApiProviderService
+import com.practice.search.app.service.provider.NaverApiProviderService
 import com.practice.search.data.TestDataGenerator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -23,7 +24,10 @@ import java.util.concurrent.Executors
 
 class SearchServiceTest {
     @Mock
-    private lateinit var webClientService: WebClientService
+    private lateinit var kakaoApiProvider: KakaoApiProviderService
+    
+    @Mock
+    private lateinit var naverApiProvider: NaverApiProviderService
 
     @Mock
     private lateinit var searchHistoryRepository: SearchHistoryRepository
@@ -33,7 +37,7 @@ class SearchServiceTest {
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        searchService = SearchService(webClientService, searchHistoryRepository, Gson())
+        searchService = SearchService(kakaoApiProvider, naverApiProvider, searchHistoryRepository, Gson())
     }
 
     // open api 테스트의 경우 dummy data를 임의로 받거나 직접 예외를 던져서 테스트하도록 구현함.
@@ -43,7 +47,7 @@ class SearchServiceTest {
 
         val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
         val mockResponse = Gson().toJson(expectedSearchResult)
-        `when`(webClientService.fetchData("test", pageable)).thenReturn(Mono.just(mockResponse))
+        `when`(kakaoApiProvider.fetchData("test", pageable)).thenReturn(Mono.just(mockResponse))
 
         val response = searchService.searchBlogs("test", pageable)
 
@@ -56,7 +60,7 @@ class SearchServiceTest {
 
         val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
         val mockResponse = Gson().toJson(expectedSearchResult)
-        `when`(webClientService.fetchData("test", pageable)).thenReturn(Mono.just(mockResponse))
+        `when`(kakaoApiProvider.fetchData("test", pageable)).thenReturn(Mono.just(mockResponse))
 
         val exception = assertThrows<ResponseException> {
             searchService.searchBlogs("test", pageable)
