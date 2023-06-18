@@ -1,8 +1,10 @@
 package com.practice.search.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.practice.search.app.exception.NoSearchResultException
-import com.practice.search.app.exception.SearchServiceException
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.practice.search.app.exception.ResponseException
+import com.practice.search.app.exception.ResponseExceptionCode
 import com.practice.search.app.service.SearchService
 import com.practice.search.data.TestDataGenerator
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -58,7 +60,7 @@ class SearchControllerTest {
     fun `Test searchBlogs endpoint with no search result`() {
         val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
         `when`(searchService.searchBlogs("test", pageable))
-            .thenThrow(NoSearchResultException("No content search result"))
+            .thenThrow(ResponseException(ResponseExceptionCode.NO_SEARCH_RESULT))
 
         val result =
             mockMvc.perform(
@@ -70,37 +72,38 @@ class SearchControllerTest {
             )
                 .andExpect(status().isNoContent)    // check 204 code
                 .andReturn()
+                .response
+                .contentAsString
 
-        val errMessage = result.resolvedException?.message
-        assertEquals("No content search result", errMessage)
+        assertEquals(
+            "There is no content",
+            Gson().fromJson(result, JsonObject::class.java).get("message").asString
+        ) // check message
     }
 
     @Test
     fun `Test searchBlogs endpoint with invalid pageable`() {
-        val result1 =
+        val pageable = PageRequest.of(51, 10, Sort.by("accuracy"))
+        `when`(searchService.searchBlogs("test", pageable))
+            .thenThrow(ResponseException(ResponseExceptionCode.INVALID_PAGEABLE))
+
+        val result =
             mockMvc.perform(
                 get("/search/blog")
                     .param("query", "test")
+                    .param("sort", "accuracy")
                     .param("page", "51") // page 50 제한
+                    .param("size", "10")
             )
                 .andExpect(status().isBadRequest)    // check 400 code
                 .andReturn()
+                .response
+                .contentAsString
 
-        val pageErrMessage = result1.resolvedException?.message
-        assertEquals("Page limit is 50", pageErrMessage)
-
-        val result2 =
-            mockMvc.perform(
-                get("/search/blog")
-                    .param("query", "test")
-                    .param("page", "1")
-                    .param("size", "51") // size 50 제한
-            )
-                .andExpect(status().isBadRequest)    // check 400 code
-                .andReturn()
-        
-        val sizeErrMessage = result2.resolvedException?.message
-        assertEquals("Size limit is 50", sizeErrMessage)
+        assertEquals(
+            "Page limit exceeded. Maximum limit is 50.",
+            Gson().fromJson(result, JsonObject::class.java).get("message").asString
+        )
     }
 
     @Test
@@ -108,7 +111,7 @@ class SearchControllerTest {
 
         val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
         `when`(searchService.searchBlogs("test", pageable))
-            .thenThrow(SearchServiceException("Internal server error"))
+            .thenThrow(ResponseException(ResponseExceptionCode.INTERNAL_SERVER_ERROR))
 
         val result =
             mockMvc.perform(
@@ -120,8 +123,12 @@ class SearchControllerTest {
             )
                 .andExpect(status().isInternalServerError)
                 .andReturn()
+                .response
+                .contentAsString
 
-        val serverErrMessage = result.resolvedException?.message
-        assertEquals("Internal server error", serverErrMessage)
+        assertEquals(
+            "Internal server error", 
+            Gson().fromJson(result, JsonObject::class.java).get("message").asString
+        )
     }
 }

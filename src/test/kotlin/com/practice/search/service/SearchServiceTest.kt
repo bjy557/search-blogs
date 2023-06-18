@@ -2,7 +2,8 @@ package com.practice.search.service
 
 import com.google.gson.Gson
 import com.practice.search.app.entity.SearchHistory
-import com.practice.search.app.exception.NoSearchResultException
+import com.practice.search.app.exception.ResponseException
+import com.practice.search.app.exception.ResponseExceptionCode
 import com.practice.search.app.repository.SearchHistoryRepository
 import com.practice.search.app.service.EntityService
 import com.practice.search.app.service.SearchService
@@ -43,7 +44,6 @@ class SearchServiceTest {
     @Test
     fun `Test searchBlogs endpoint with successful search result`() {
         val expectedSearchResult = TestDataGenerator.generateSearchResult()
-        val expectedResponse = TestDataGenerator.generateSearchBlogResponse()
         
         val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
         val mockResponse = Gson().toJson(expectedSearchResult)
@@ -51,7 +51,7 @@ class SearchServiceTest {
 
         val response = searchService.searchBlogs("test", pageable)
 
-        assertEquals(expectedResponse, response)
+        assertEquals(expectedSearchResult, response)
     }
 
     @Test
@@ -62,11 +62,11 @@ class SearchServiceTest {
         val mockResponse = Gson().toJson(expectedSearchResult)
         `when`(webClientService.fetchData("test", pageable)).thenReturn(Mono.just(mockResponse))
 
-        val exception = assertThrows<NoSearchResultException> { 
+        val exception = assertThrows<ResponseException> { 
             searchService.searchBlogs("test", pageable)
         }
-        val status = exception::class.java.getAnnotation(ResponseStatus::class.java)
-        assertEquals(HttpStatus.NO_CONTENT, status)
+        
+        assertEquals(HttpStatus.NO_CONTENT, exception.responseExceptionCode.status)
     }
     
     @Test
