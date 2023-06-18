@@ -16,6 +16,8 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 import reactor.core.publisher.Mono
 
 class SearchServiceTest {
@@ -56,9 +58,11 @@ class SearchServiceTest {
         val mockResponse = Gson().toJson(expectedSearchResult)
         `when`(webClientService.fetchData("test", pageable)).thenReturn(Mono.just(mockResponse))
 
-        assertThrows<NoSearchResultException> { 
+        val exception = assertThrows<NoSearchResultException> { 
             searchService.searchBlogs("test", pageable)
         }
+        val status = exception::class.java.getAnnotation(ResponseStatus::class.java)
+        assertEquals(HttpStatus.NO_CONTENT, status)
     }
     
     @Test
