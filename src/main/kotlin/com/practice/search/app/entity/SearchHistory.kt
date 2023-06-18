@@ -3,7 +3,7 @@ package com.practice.search.app.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "search_history")
+@Table(name = "search_history", indexes = [Index(name = "idx_count", columnList = "count")])
 data class SearchHistory(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
