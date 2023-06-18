@@ -9,6 +9,7 @@ import com.practice.search.app.repository.SearchHistoryRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import java.nio.charset.Charset
 
 @Service
 @Transactional
@@ -19,14 +20,11 @@ class SearchService(
     private val entityService: EntityService
 ) {
     fun searchBlogs(query: String, pageable: Pageable): SearchResult {
-        print(pageable)
-        if (pageable.pageNumber > 50 || pageable.pageSize > 50) {
-            throw ResponseException(ResponseExceptionCode.INVALID_PAGEABLE)
-        }
+        validateParameter(query, pageable)
 
         val response = webClientService.fetchData(query, pageable).block()
         val searchResult = gson.fromJson(response, SearchResult::class.java)
-        
+
         if (searchResult.documents.isEmpty()) {
             throw ResponseException(ResponseExceptionCode.NO_SEARCH_RESULT)
         }
@@ -40,7 +38,21 @@ class SearchService(
         val searchHistory = searchHistoryRepository.findByKeyword(keyword)
         searchHistory?.run {
             count++
-            entityService.saveEntityWithLock(this) // 동시성 이슈 lock 추가
-        } ?: entityService.saveEntityWithLock(SearchHistory(keyword, 1))
+            searchHistoryRepository.save(searchHistory)
+        } ?: searchHistoryRepository.save(SearchHistory(keyword, 1))
+    }
+
+    fun validateParameter(query: String, pageable: Pageable) {
+        if (pageable.pageNumber > 50) {
+            throw ResponseException(ResponseExceptionCode.INVALID_PAGE_NUMBER)
+        }
+        
+         if (pageable.pageSize > 50) {
+            throw ResponseException(ResponseExceptionCode.INVALID_SIZE_NUMBER)
+        }
+
+        if (query.toByteArray(Charset.forName("euc-kr")).size < 3) { // 영어 3자, 한글 2자 제한
+            throw ResponseException(ResponseExceptionCode.INVALID_QUERY)
+        }
     }
 }
