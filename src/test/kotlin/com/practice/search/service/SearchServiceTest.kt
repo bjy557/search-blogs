@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.practice.search.app.entity.SearchHistory
 import com.practice.search.app.exception.NoSearchResultException
 import com.practice.search.app.repository.SearchHistoryRepository
+import com.practice.search.app.service.EntityService
 import com.practice.search.app.service.SearchService
 import com.practice.search.app.service.WebClientService
 import com.practice.search.data.TestDataGenerator
@@ -27,12 +28,15 @@ class SearchServiceTest {
     @Mock
     private lateinit var searchHistoryRepository: SearchHistoryRepository
 
+    @Mock
+    private lateinit var entityService: EntityService
+    
     private lateinit var searchService: SearchService
 
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        searchService = SearchService(webClientService, searchHistoryRepository, Gson())
+        searchService = SearchService(webClientService, searchHistoryRepository, Gson(), entityService)
     }
 
     // open api 테스트의 경우 dummy data를 임의로 받거나 직접 예외를 던져서 테스트하도록 구현함.
@@ -72,7 +76,6 @@ class SearchServiceTest {
         val existingSearchHistory = SearchHistory(keyword, 5)
 
         `when`(searchHistoryRepository.findByKeyword(keyword)).thenReturn(existingSearchHistory)
-        `when`(searchHistoryRepository.save(existingSearchHistory)).thenReturn(existingSearchHistory)
 
         searchService.increaseSearchCount(keyword)
 
