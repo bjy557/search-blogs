@@ -9,6 +9,8 @@ import reactor.core.publisher.Mono
 
 @Service
 class NaverApiProviderService(
+    @Value("\${api.naver.baseUrl}")
+    private val baseUrl: String,
     @Value("\${api.naver.clientId}")
     private val clientId: String,
     @Value("\${api.naver.clientSecret}")
@@ -16,10 +18,8 @@ class NaverApiProviderService(
     private val webClient: WebClient,
 ) : ApiProviderService {
     override fun fetchData(query: String, pageable: Pageable): Mono<String> {
-        val baseUrl = "https://openapi.naver.com/v1/search/blog.json"
-        
-        // naver api query param 형태에 맞게 porting
-        val sort = 
+        // naver api query param 형태에 맞게 modify
+        val sort =
             if (pageable.sort.map { it.property }.toList()[0].equals("accuracy"))
                 "sim"
             else

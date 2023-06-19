@@ -14,7 +14,9 @@ spring:
     open-in-view: false # turn off open-in-view warning
 api:
   kakao:
+    baseUrl: https://dapi.kakao.com/v2/search/blog
     authKey: 4e6eb0239daece9d056f2a77449bcfb4
   naver:
+    baseUrl: https://openapi.naver.com/v1/search/blog.json
     clientId: vfD_fz08FtdfU90XjAXo
     clientSecret: hNsdGAQYNG

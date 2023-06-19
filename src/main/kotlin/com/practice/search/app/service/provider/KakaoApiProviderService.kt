@@ -9,13 +9,13 @@ import reactor.core.publisher.Mono
 
 @Service
 class KakaoApiProviderService(
+    @Value("\${api.kakao.baseUrl}")
+    private val baseUrl: String,
     @Value("\${api.kakao.authKey}")
     private val authKey: String,
     private val webClient: WebClient,
 ) : ApiProviderService {
     override fun fetchData(query: String, pageable: Pageable): Mono<String> {
-        val baseUrl = "https://dapi.kakao.com/v2/search/blog"
-
         // sort property만 추출, direction 값을 같이 넘기면(ex. accuracy:ASC) 정렬 안되는 이슈 
         val sort = pageable.sort.map { it.property }.toList()[0]
 
