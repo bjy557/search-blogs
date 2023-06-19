@@ -1,7 +1,7 @@
 package com.practice.search.web.controller.api
 
-import com.practice.search.app.service.SearchHistoryService
-import com.practice.search.app.service.SearchService
+import com.practice.search.app.service.search.SearchHistoryService
+import com.practice.search.app.service.search.SearchService
 import com.practice.search.web.response.SearchBlogResponse
 import com.practice.search.web.response.SearchHistoryResponse
 import org.springframework.data.domain.Pageable

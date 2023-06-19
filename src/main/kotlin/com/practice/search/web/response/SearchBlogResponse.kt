@@ -1,6 +1,6 @@
 package com.practice.search.web.response
 
-import com.practice.search.app.entity.Document
+import com.practice.search.app.entity.search.Document
 import org.springframework.data.domain.Pageable
 
 data class SearchBlogResponse(

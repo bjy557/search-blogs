@@ -6,8 +6,8 @@ import com.google.gson.JsonObject
 import com.practice.search.app.dto.SearchHistoryDto
 import com.practice.search.app.exception.ResponseException
 import com.practice.search.app.exception.ResponseExceptionCode
-import com.practice.search.app.service.SearchHistoryService
-import com.practice.search.app.service.SearchService
+import com.practice.search.app.service.search.SearchHistoryService
+import com.practice.search.app.service.search.SearchService
 import com.practice.search.data.TestDataGenerator
 import com.practice.search.web.response.SearchHistoryResponse
 import org.junit.jupiter.api.Assertions.assertEquals

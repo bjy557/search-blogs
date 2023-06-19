@@ -1,4 +1,4 @@
-package com.practice.search.app.entity
+package com.practice.search.app.entity.search.alternative
 
 data class NaverApiResponse(
     val items: List<Item> = emptyList(),

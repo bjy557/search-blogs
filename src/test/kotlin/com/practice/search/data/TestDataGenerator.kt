@@ -1,9 +1,8 @@
 package com.practice.search.data
 
-import com.practice.search.app.entity.Document
-import com.practice.search.app.entity.Meta
-import com.practice.search.app.entity.SearchHistory
-import com.practice.search.app.entity.SearchResult
+import com.practice.search.app.entity.search.Document
+import com.practice.search.app.entity.search.SearchHistory
+import com.practice.search.app.entity.search.SearchResult
 import com.practice.search.web.response.SearchBlogResponse
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -11,7 +10,8 @@ import org.springframework.data.domain.Sort
 object TestDataGenerator {
     fun generateSearchResult(): SearchResult {
         return SearchResult(
-            Meta(totalCount = 100, pageableCount = 10, isEnd = false),
+            10,
+            false,
             listOf(
                 Document(
                     title = "test blog",
@@ -24,14 +24,15 @@ object TestDataGenerator {
             )
         )
     }
-    
+
     fun generateEmptySearchResult(): SearchResult {
         return SearchResult(
-            Meta(totalCount = 100, pageableCount = 10, isEnd = false),
+            10,
+            false,
             emptyList()
         )
     }
-    
+
     fun generateSearchBlogResponse(): SearchBlogResponse {
         val searchResult = generateSearchResult()
 
@@ -43,7 +44,7 @@ object TestDataGenerator {
             last = false
         )
     }
-    
+
     fun generateSearchHistories(): List<SearchHistory> {
         return listOf(
             SearchHistory("k1", 10),

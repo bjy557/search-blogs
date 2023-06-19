@@ -1,7 +1,7 @@
 package com.practice.search.service
 
 import com.practice.search.app.repository.SearchHistoryRepository
-import com.practice.search.app.service.SearchHistoryService
+import com.practice.search.app.service.search.SearchHistoryService
 import com.practice.search.data.TestDataGenerator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach

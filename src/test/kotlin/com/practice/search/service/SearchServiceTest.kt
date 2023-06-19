@@ -1,12 +1,12 @@
 package com.practice.search.service
 
 import com.google.gson.Gson
-import com.practice.search.app.entity.SearchHistory
+import com.practice.search.app.entity.search.SearchHistory
 import com.practice.search.app.exception.ResponseException
 import com.practice.search.app.repository.SearchHistoryRepository
-import com.practice.search.app.service.SearchService
 import com.practice.search.app.service.provider.KakaoApiProviderService
 import com.practice.search.app.service.provider.NaverApiProviderService
+import com.practice.search.app.service.search.SearchService
 import com.practice.search.data.TestDataGenerator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach

@@ -1,7 +1,7 @@
-package com.practice.search.app.service
+package com.practice.search.app.service.search
 
 import com.practice.search.app.dto.SearchHistoryDto
-import com.practice.search.app.entity.SearchHistory
+import com.practice.search.app.entity.search.SearchHistory
 import com.practice.search.app.repository.SearchHistoryRepository
 import org.springframework.stereotype.Service
 

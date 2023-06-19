@@ -1,10 +1,9 @@
-package com.practice.search.app.service
+package com.practice.search.app.service.search
 
 import com.google.gson.Gson
-import com.practice.search.app.entity.KakaoApiResponse
-import com.practice.search.app.entity.NaverApiResponse
-import com.practice.search.app.entity.SearchHistory
-import com.practice.search.app.entity.SearchResult
+import com.practice.search.app.entity.search.SearchHistory
+import com.practice.search.app.entity.search.SearchResult
+import com.practice.search.app.entity.search.alternative.NaverApiResponse
 import com.practice.search.app.exception.ResponseException
 import com.practice.search.app.exception.ResponseExceptionCode
 import com.practice.search.app.repository.SearchHistoryRepository
@@ -34,10 +33,10 @@ class SearchService(
 
                 when (apiProvider) {
                     is KakaoApiProviderService -> {
-                        val kakaoResponse = gson.fromJson(response, KakaoApiResponse::class.java)
-                        if (kakaoResponse.documents.isNotEmpty()) {
+                        val searchResult = gson.fromJson(response, SearchResult::class.java)
+                        if (searchResult.documents.isNotEmpty()) {
                             increaseSearchCount(query)
-                            return SearchResult.of(kakaoResponse)
+                            return searchResult
                         }
                     }
 
@@ -58,7 +57,7 @@ class SearchService(
         throw ResponseException(ResponseExceptionCode.NO_SEARCH_RESULT)
     }
 
-//    @Lock(value = LockModeType.PESSIMISTIC_WRITE) // fail test 100 requests concurrently
+    // @Lock(value = LockModeType.PESSIMISTIC_WRITE) // fail test 100 requests concurrently
     @Synchronized // success test 100 requests concurrently
     fun increaseSearchCount(keyword: String) {
         val searchHistory = searchHistoryRepository.findByKeyword(keyword)

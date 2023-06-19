@@ -1,6 +1,6 @@
 package com.practice.search.app.dto
 
-import com.practice.search.app.entity.SearchHistory
+import com.practice.search.app.entity.search.SearchHistory
 
 data class SearchHistoryDto(
     val keyword: String,

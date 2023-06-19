@@ -1,4 +1,6 @@
-package com.practice.search.app.entity
+package com.practice.search.app.entity.search
+
+import com.practice.search.app.entity.search.alternative.Item
 
 data class Document(
     val title: String = "",
