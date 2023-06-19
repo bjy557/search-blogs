@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 @ControllerAdvice
 class GlobalExceptionHandler {
     @ExceptionHandler(ResponseException::class)
-    fun handleInvalidPageableException(ex: ResponseException): ResponseEntity<ErrorResponse> {
+    fun handleResponseException(ex: ResponseException): ResponseEntity<ErrorResponse> {
         val re = ex.responseExceptionCode
         return ResponseEntity.status(re.status)
-            .body(ErrorResponse(re.status.value(), re.message))
+            .body(ErrorResponse(re.code, re.message))
     }
 }
