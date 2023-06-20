@@ -1,10 +1,10 @@
 package com.practice.search.response
 
-import com.practice.search.entity.Document
+import com.practice.search.entity.Content
 import org.springframework.data.domain.Pageable
 
 data class SearchBlogResponse(
-    val content: List<Document>,
+    val content: List<Content>,
     val pageable: Pageable,
     var totalElements: Int,
     var totalPages: Int,

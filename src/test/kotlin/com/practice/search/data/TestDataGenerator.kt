@@ -1,6 +1,7 @@
 package com.practice.search.data
 
-import com.practice.search.entity.Document
+import com.practice.search.entity.Content
+import com.practice.search.entity.kapi.Document
 import com.practice.search.entity.SearchHistory
 import com.practice.search.entity.SearchResult
 import com.practice.search.response.SearchBlogResponse
@@ -13,7 +14,7 @@ object TestDataGenerator {
             10,
             false,
             listOf(
-                Document(
+                Content(
                     title = "test blog",
                     contents = "this is test blog",
                     url = "https://example.com/test-blog",
@@ -37,7 +38,7 @@ object TestDataGenerator {
         val searchResult = generateSearchResult()
 
         return SearchBlogResponse(
-            content = searchResult.documents,
+            content = searchResult.contents,
             pageable = PageRequest.of(1, 10, Sort.by("accuracy")),
             totalElements = 10,
             totalPages = 1,

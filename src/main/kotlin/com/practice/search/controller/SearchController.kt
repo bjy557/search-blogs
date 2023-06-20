@@ -30,7 +30,7 @@ class SearchController(
         
         return ResponseEntity.ok(
             SearchBlogResponse(
-                searchResult.documents,
+                searchResult.contents,
                 pageable,
                 totalElements,
                 totalPages,

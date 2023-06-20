@@ -3,7 +3,8 @@ package com.practice.search.service.search
 import com.google.gson.Gson
 import com.practice.search.entity.SearchHistory
 import com.practice.search.entity.SearchResult
-import com.practice.search.entity.alternative.NaverApiResponse
+import com.practice.search.entity.kapi.KakaoApiResponse
+import com.practice.search.entity.napi.NaverApiResponse
 import com.practice.search.exception.ResponseException
 import com.practice.search.exception.ResponseExceptionCode
 import com.practice.search.repository.SearchHistoryRepository
