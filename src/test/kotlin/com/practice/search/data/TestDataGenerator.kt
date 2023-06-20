@@ -1,9 +1,9 @@
 package com.practice.search.data
 
-import com.practice.search.app.entity.search.Document
-import com.practice.search.app.entity.search.SearchHistory
-import com.practice.search.app.entity.search.SearchResult
-import com.practice.search.web.response.SearchBlogResponse
+import com.practice.search.entity.Document
+import com.practice.search.entity.SearchHistory
+import com.practice.search.entity.SearchResult
+import com.practice.search.response.SearchBlogResponse
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 
