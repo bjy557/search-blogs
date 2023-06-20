@@ -8,12 +8,14 @@ import com.practice.search.entity.napi.NaverApiResponse
 import com.practice.search.exception.ResponseException
 import com.practice.search.exception.ResponseExceptionCode
 import com.practice.search.repository.SearchHistoryRepository
+import com.practice.search.service.provider.ApiProviderService
 import com.practice.search.service.provider.KakaoApiProviderService
 import com.practice.search.service.provider.NaverApiProviderService
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.nio.charset.Charset
+import java.time.Duration
 
 @Service
 @Transactional
@@ -23,39 +25,34 @@ class SearchService(
     private val searchHistoryRepository: SearchHistoryRepository,
     private val gson: Gson
 ) {
-    fun searchBlogs(query: String, pageable: Pageable): SearchResult {
+    fun searchBlogs(query: String, pageable: Pageable): SearchResult? {
         validateParameter(query, pageable)
-
-        val apiProviders = listOf(kakaoApiProvider, naverApiProvider)
-
-        for (apiProvider in apiProviders) {
+        
+        for (apiProvider in listOf(kakaoApiProvider, naverApiProvider)) {
             try {
-                val response = apiProvider.fetchData(query, pageable).block()
+                val response = apiProvider.fetchData(query, pageable)
+                    .block(Duration.ofSeconds(5))
+                    ?: continue // timeout 발생 시 alt api로 전환
+                
+                increaseSearchCount(query)
+                return extractSearchResult(apiProvider, response)
 
-                when (apiProvider) {
-                    is KakaoApiProviderService -> {
-                        val searchResult = gson.fromJson(response, SearchResult::class.java)
-                        if (searchResult.documents.isNotEmpty()) {
-                            increaseSearchCount(query)
-                            return searchResult
-                        }
-                    }
-
-                    is NaverApiProviderService -> {
-                        val naverResponse = gson.fromJson(response, NaverApiResponse::class.java)
-                        if (naverResponse.items.isNotEmpty()) {
-                            increaseSearchCount(query)
-                            return SearchResult.of(naverResponse)
-                        }
-                    }
-                    // add other open api
-                }
             } catch (e: Exception) {
+                // 최초 api(kapi) 장애 시 alt api로 전환
                 continue
             }
         }
 
-        throw ResponseException(ResponseExceptionCode.NO_SEARCH_RESULT)
+        return null
+    }
+
+    fun extractSearchResult(apiProvider: ApiProviderService, response: String): SearchResult? {
+        return when (apiProvider) {
+            is KakaoApiProviderService -> apiProvider.extractSearchResult(response)
+            is NaverApiProviderService -> apiProvider.extractSearchResult(response)
+            // add other open api
+            else -> null
+        }
     }
 
     // @Lock(value = LockModeType.PESSIMISTIC_WRITE) // fail test 100 requests concurrently

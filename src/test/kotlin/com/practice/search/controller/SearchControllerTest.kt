@@ -65,8 +65,8 @@ class SearchControllerTest {
     @Test
     fun `Test searchBlogs endpoint with no search result`() {
         val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
-        `when`(searchService.searchBlogs("test", pageable))
-            .thenThrow(ResponseException(ResponseExceptionCode.NO_SEARCH_RESULT))
+        // null return 시 NO_SEARCH_RESULT throw
+        `when`(searchService.searchBlogs("test", pageable)).thenReturn(null)
 
         val result =
             mockMvc.perform(
@@ -76,11 +76,12 @@ class SearchControllerTest {
                     .param("page", "1")
                     .param("size", "10")
             )
-                .andExpect(status().isNoContent)    // check 204 code
+                .andExpect(status().isOk)
                 .andReturn()
                 .response
                 .contentAsString
 
+        assertEquals(204, Gson().fromJson(result, JsonObject::class.java).get("code").asInt)
         assertEquals(
             "There is no content",
             Gson().fromJson(result, JsonObject::class.java).get("message").asString

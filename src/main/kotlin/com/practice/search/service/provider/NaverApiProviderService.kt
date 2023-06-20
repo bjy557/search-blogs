@@ -1,5 +1,8 @@
 package com.practice.search.service.provider
 
+import com.google.gson.Gson
+import com.practice.search.entity.SearchResult
+import com.practice.search.entity.napi.NaverApiResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -39,5 +42,10 @@ class NaverApiProviderService(
             .header("X-Naver-Client-Secret", clientSecret)
             .retrieve()
             .bodyToMono(String::class.java)
+    }
+    
+    override fun extractSearchResult(response: String): SearchResult? {
+        val naverResponse = Gson().fromJson(response, NaverApiResponse::class.java)
+        return SearchResult.of(naverResponse)
     }
 }

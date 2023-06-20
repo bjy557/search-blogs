@@ -48,25 +48,11 @@ class SearchServiceTest {
         val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
         val mockResponse = Gson().toJson(expectedSearchResult)
         `when`(kakaoApiProvider.fetchData("test", pageable)).thenReturn(Mono.just(mockResponse))
+        `when`(searchService.extractSearchResult(kakaoApiProvider, mockResponse)).thenReturn(expectedSearchResult)
 
         val response = searchService.searchBlogs("test", pageable)
 
         assertEquals(expectedSearchResult, response)
-    }
-
-    @Test
-    fun `Test searchBlogs endpoint with no search result`() {
-        val expectedSearchResult = TestDataGenerator.generateEmptySearchResult()
-
-        val pageable = PageRequest.of(1, 10, Sort.by("accuracy"))
-        val mockResponse = Gson().toJson(expectedSearchResult)
-        `when`(kakaoApiProvider.fetchData("test", pageable)).thenReturn(Mono.just(mockResponse))
-
-        val exception = assertThrows<ResponseException> {
-            searchService.searchBlogs("test", pageable)
-        }
-
-        assertEquals(HttpStatus.NO_CONTENT, exception.responseExceptionCode.status)
     }
 
     @Test

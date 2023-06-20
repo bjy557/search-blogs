@@ -1,5 +1,7 @@
 package com.practice.search.controller
 
+import com.practice.search.exception.ResponseException
+import com.practice.search.exception.ResponseExceptionCode
 import com.practice.search.response.SearchBlogResponse
 import com.practice.search.response.SearchHistoryResponse
 import com.practice.search.service.search.SearchHistoryService
@@ -25,6 +27,8 @@ class SearchController(
         @PageableDefault(size = 10, page = 1, sort = ["accuracy", "recency"]) pageable: Pageable
     ): ResponseEntity<SearchBlogResponse> {
         val searchResult = searchService.searchBlogs(query, pageable)
+            ?: throw ResponseException(ResponseExceptionCode.NO_SEARCH_RESULT)
+        
         val totalElements = searchResult.pageableCount
         val totalPages = ceil(totalElements / pageable.pageSize.toDouble()).toInt()
         

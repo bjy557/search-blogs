@@ -1,5 +1,8 @@
 package com.practice.search.service.provider
 
+import com.google.gson.Gson
+import com.practice.search.entity.SearchResult
+import com.practice.search.entity.kapi.KakaoApiResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -32,5 +35,10 @@ class KakaoApiProviderService(
             .header("Authorization", "KakaoAK $authKey")
             .retrieve()
             .bodyToMono(String::class.java)
+    }
+    
+    override fun extractSearchResult(response: String): SearchResult? {
+        val kakaoResponse = Gson().fromJson(response, KakaoApiResponse::class.java)
+        return SearchResult.of(kakaoResponse)
     }
 }
